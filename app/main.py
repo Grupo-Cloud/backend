@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from app.infrastructure.s3 import s3_storage
+from app.routers import files
 from contextlib import asynccontextmanager
+import io
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,6 +21,9 @@ async def lifespan(app: FastAPI):
     
         
 app = FastAPI(lifespan=lifespan)
+
+app.include_router(files.router,prefix="/files",tags=["files"])
+
 
 
 @app.get("/")

@@ -13,8 +13,8 @@ def get_s3_client() -> Minio:
     settings = get_s3_settings()
 
     if not settings:
-        logger.warning("⚠️ MinIO is disabled due to missing configuration.")
-        raise RuntimeError("MinIO is disabled.")
+        logger.warning("⚠️ S3 is disabled due to missing configuration.")
+        raise RuntimeError("S3 is disabled.")
 
     return Minio(
         endpoint=settings.S3_HOST,

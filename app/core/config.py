@@ -1,52 +1,51 @@
-import os
-from dotenv import load_dotenv
-import json
+from functools import lru_cache
+from typing import ClassVar
+from pydantic import ValidationError
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-class Config:
-    _instance = None 
+from app.core.logger import get_logger
 
-    def __new__(cls, env=None):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance.initialize(env)
-        return cls._instance
-
-    def initialize(self, env=None):
-        self.env = env 
-        self.load_env_file()
-        self.load_config_variables()
-
-    def load_env_file(self):
-        env_files = {
-            "dev": ".env.dev",
-            "prod": ".env.prod",
-        }
-        env_file = env_files.get(self.env)
-
-        if not env_file:
-            raise ValueError(f"Invalid environment '{self.env}'. Choose from {list(env_files.keys())}")
-
-        if not os.path.exists(env_file):
-            raise FileNotFoundError(f"Environment file '{env_file}' not found!")
-
-        load_dotenv(env_file)
-
-    def load_config_variables(self):
-        self.variables = {
-            "S3_HOST": os.getenv("S3_HOST"),
-            "S3_ACCESS_KEY": os.getenv("S3_ACCESS_KEY"),
-            "S3_SECRET_KEY": os.getenv("S3_SECRET_KEY"),
-            "S3_BUCKET_DOCUMENTS": os.getenv("S3_BUCKET_DOCUMENTS"),
-            "S3_BUCKET_CHUNKS": os.getenv("S3_BUCKET_CHUNKS"),
-            "SECURE_S3_CONNECTION": json.loads(os.getenv("SECURE_S3_CONNECTION").lower()),
-        }
-
-    def get(self, key, default=None):
-        return self.variables.get(key, default)
-
-    def get_env(self):
-        return self.env
-
-config = Config(env="dev") 
+logger = get_logger(__name__)
 
 
+class CoreSettings(BaseSettings):
+    """Critical settings that must be defined, otherwise app crashes."""
+
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(env_file=".env")
+
+
+class S3Settings(BaseSettings):
+    """Optional S3 settings. If missing, S3 operations will be disabled."""
+
+    S3_HOST: str
+    S3_ACCESS_KEY: str
+    S3_SECRET_KEY: str
+    S3_SECURE: bool
+    S3_TYPE: str
+    S3_DOCUMENT_BUCKET: str
+
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(env_file=".env")
+
+
+# Load core settings (mandatory, app crashes if missing)
+@lru_cache
+def get_core_settings() -> CoreSettings:
+    try:
+        return CoreSettings.model_validate({})
+    except ValidationError as e:
+        logger.critical(f"❌ Missing critical environment variables: {e}")
+        raise SystemExit(1)  # ❌ Hard crash
+
+
+# Load optional settings (app still runs even if they fail)
+@lru_cache
+def get_s3_settings() -> S3Settings | None:
+    try:
+        return S3Settings.model_validate({})
+    except ValidationError:
+        logger.warning("S3 settings are missing, S3 features are disabled.")
+        return None
+
+
+_ = get_core_settings()
+_ = get_s3_settings()

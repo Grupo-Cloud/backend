@@ -24,8 +24,6 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(files.router,prefix="/files",tags=["files"])
 
-
-
 @app.get("/")
 def redirect_to_docs():
     return RedirectResponse(url="/docs")

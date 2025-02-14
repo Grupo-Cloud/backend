@@ -3,28 +3,30 @@ from datetime import timedelta
 from minio import Minio
 from typing import Self
 from minio.helpers import ObjectWriteResult
-
+from enum import Enum
 
 class S3Storage:
 
     _instance: Self = None
-
+    
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance.__initialize()
         return cls._instance
-
+    
+    
     def __initialize(self) -> None:
+        
         self.client = Minio(
-            config.S3_HOST,
-            access_key=config.S3_ACCESS_KEY,
-            secret_key=config.S3_SECRET_KEY,
-            secure=False
+            endpoint=config.get("S3_HOST"),
+            access_key=config.get("S3_ACCESS_KEY"),
+            secret_key=config.get("S3_SECRET_KEY"),
+            secure=config.get("SECURE_S3_CONNECTION", True)
         )
-        self.documents_bucket = config.S3_BUCKET_DOCUMENTS
-        self.chunks_bucket = config.S3_BUCKET_CHUNKS
-        self.bucket_list = [self.documents_bucket, self.chunks_bucket]
+        self.documents_bucket = config.get("S3_BUCKET_DOCUMENTS")
+        self.bucket_list = [self.documents_bucket]
+                   
 
     def bucket_exists(self, bucket: str) -> bool:
         found = self.client.bucket_exists(bucket)
@@ -62,7 +64,7 @@ class S3Storage:
         )
 
     def get_url(self, bucket_name, object_name):
-        return f"{config.S3_HOST}/{bucket_name}/{object_name}"
+        return f"{config.get("S3_HOST")}/{bucket_name}/{object_name}"
 
 
 s3_storage = S3Storage()

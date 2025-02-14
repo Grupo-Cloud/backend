@@ -11,7 +11,9 @@ logger = get_logger(__name__)
 class CoreSettings(BaseSettings):
     """Critical settings that must be defined, otherwise app crashes."""
 
-    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(env_file=".env.dev", extra="ignore")
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        env_file=(".env", ".env.dev"), extra="ignore"
+    )
 
 
 class S3Settings(BaseSettings):
@@ -24,7 +26,9 @@ class S3Settings(BaseSettings):
     S3_TYPE: str
     S3_DOCUMENT_BUCKET: str
 
-    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(env_file=".env.dev", extra="ignore")
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        env_file=(".env", ".env.dev"), extra="ignore"
+    )
 
 
 # Load core settings (mandatory, app crashes if missing)

@@ -6,7 +6,7 @@ ENV/
 
 # Ignore environment files
 .env*
-!.env.example  # Allow an example environment file
+!.env.example 
 
 # Ignore Git-related files
 .git

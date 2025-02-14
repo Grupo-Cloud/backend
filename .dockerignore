@@ -1,0 +1,23 @@
+# Ignore virtual environments
+.venv
+venv/
+env/
+ENV/
+
+# Ignore environment files
+.env*
+!.env.example  # Allow an example environment file
+
+# Ignore Git-related files
+.git
+.gitignore
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore Docker-related files
+Dockerfile~
+docker-compose.yml~

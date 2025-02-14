@@ -24,5 +24,6 @@ async def upload_file(
         data=bytes_data,
         content_type=file.content_type or "",
         length=-1,
+        part_size=10 * 1024 * 1024,
     )
     return {"filename": file.filename, "object_name": object_info.object_name}

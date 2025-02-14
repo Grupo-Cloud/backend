@@ -22,7 +22,7 @@ class S3Storage:
             endpoint=config.get("S3_HOST"),
             access_key=config.get("S3_ACCESS_KEY"),
             secret_key=config.get("S3_SECRET_KEY"),
-            secure=config.get("SECURE_S3_CONNECTION", True)
+            secure=config.get("SECURE_S3_CONNECTION")
         )
         self.documents_bucket = config.get("S3_BUCKET_DOCUMENTS")
         self.bucket_list = [self.documents_bucket]

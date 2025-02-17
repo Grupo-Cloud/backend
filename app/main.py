@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from app.core.lifespan import lifespan
+from app.db.database import Base, engine
 from app.routers import files
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(lifespan=lifespan)
 

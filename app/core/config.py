@@ -12,6 +12,7 @@ class CoreSettings(BaseSettings):
     """Critical settings that must be defined, otherwise app crashes."""
 
     DATABASE_URL: str
+    JWT_SECRET_KEY: str
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=(".env", ".env.dev"), extra="ignore"

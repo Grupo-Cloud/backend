@@ -7,4 +7,4 @@ class OAuth2LoginResponse(BaseModel):
 
 
 class OAuth2RefreshResponse(BaseModel):
-    refresh_token: str
+    access_token: str

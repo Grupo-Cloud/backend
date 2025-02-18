@@ -7,7 +7,11 @@ from minio import Minio
 from app.core.config import S3Settings, get_s3_settings
 from app.dependencies import get_s3_client
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/files",
+    tags=["files"],
+    responses={404: {"detail": "File could not be found"}},
+)
 
 
 @router.post("/upload")

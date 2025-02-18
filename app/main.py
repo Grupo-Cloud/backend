@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from app.core.lifespan import lifespan
 from app.db.database import Base, engine
-from app.routers import files
+from app.api import files
 
 import importlib
 import pkgutil
@@ -16,7 +16,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(files.router, prefix="/files", tags=["files"])
+app.include_router(files.router)
 
 
 @app.get("/")

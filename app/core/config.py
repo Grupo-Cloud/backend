@@ -11,6 +11,8 @@ logger = get_logger(__name__)
 class CoreSettings(BaseSettings):
     """Critical settings that must be defined, otherwise app crashes."""
 
+    DATABASE_URL: str
+
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=(".env", ".env.dev"), extra="ignore"
     )

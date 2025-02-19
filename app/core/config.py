@@ -13,6 +13,7 @@ class CoreSettings(BaseSettings):
 
     DATABASE_URL: str
     JWT_SECRET_KEY: str
+    JWT_REFRESH_KEY: str
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=(".env", ".env.dev"), extra="ignore"

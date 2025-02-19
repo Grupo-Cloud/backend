@@ -10,13 +10,16 @@ if TYPE_CHECKING:
 
 
 class BaseUser(BaseModel):
-    id: UUID
     email: EmailStr
     username: str
 
 
+class CreateUser(BaseUser):
+    password: str
+
+
 class GetUser(BaseUser):
-    pass
+    id: UUID
 
 
 class GetUserDetail(GetUser):

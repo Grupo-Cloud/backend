@@ -16,7 +16,7 @@ class User(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(index=True, unique=True, nullable=False)
     username: Mapped[str] = mapped_column(nullable=False)
-    hashed_secret: Mapped[str] = mapped_column(nullable=False)
+    hashed_secret: Mapped[bytes] = mapped_column(nullable=False)
 
     documents: Mapped[list["Document"]] = relationship(back_populates="user")
     chats: Mapped[list["Chat"]] = relationship(back_populates="user")

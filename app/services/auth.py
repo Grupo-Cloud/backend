@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import final
 from uuid import UUID
-from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
@@ -15,13 +14,13 @@ from app.schemas.user import CreateUser
 from app.services.user import service as user_service
 
 import jwt
+import bcrypt
 
 
 @final
 class AuthService:
 
-    OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
-    PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="/auth/login")
     ALGORITHM = "HS256"
 
     ACCESS_TOKEN_EXPIRATION = timedelta(minutes=15)
@@ -32,11 +31,14 @@ class AuthService:
     def __init__(self, core_settings: CoreSettings) -> None:
         self.core_settings = core_settings
 
-    def _verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        return self.PWD_CONTEXT.verify(plain_password, hashed_password)
+    def _verify_password(self, plain_password: str, hashed_password: bytes) -> bool:
+        password_byte_enc = plain_password.encode("utf-8")
+        return bcrypt.checkpw(password_byte_enc, hashed_password)
 
-    def _hash_password(self, plain_password: str) -> str:
-        return self.PWD_CONTEXT.hash(plain_password)
+    def _hash_password(self, plain_password: str) -> bytes:
+        password_byte_enc = plain_password.encode("utf-8")
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(password_byte_enc, salt)
 
     def _create_access_token(self, user_id: UUID) -> str:
         payload: dict[str, str | datetime] = {"sub": str(user_id)}
@@ -105,7 +107,7 @@ class AuthService:
         user = user_service.get_user_by_email(db, email)
         if user is None:
             raise UserNotFoundException()
-        if not self._verify_password(user.hashed_secret, password):
+        if not self._verify_password(password, user.hashed_secret):
             raise InvalidPasswordException()
         return OAuth2LoginResponse(
             access_token=self._create_access_token(user.id),

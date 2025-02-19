@@ -20,7 +20,7 @@ class UserService:
         return db.execute(statement).scalar_one_or_none()
 
     def create_user(
-        self, db: Session, email: EmailStr, username: str, hashed_secret: str
+        self, db: Session, email: EmailStr, username: str, hashed_secret: bytes
     ) -> None:
         statement = insert(User).values(
             id=uuid4(),

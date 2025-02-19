@@ -1,10 +1,6 @@
 # pyright: reportImportCycles=false
-from typing import TYPE_CHECKING
 from uuid import UUID
 from pydantic import BaseModel
-
-if TYPE_CHECKING:
-    from app.schemas.document import GetDocument
 
 
 class BaseChunk(BaseModel):
@@ -18,3 +14,8 @@ class GetChunk(BaseChunk):
 
 class GetChunkDetail(GetChunk):
     document: list["GetDocument"]
+
+
+from app.schemas.document import GetDocument
+
+_ = GetChunkDetail.model_rebuild()

@@ -1,11 +1,6 @@
 # pyright: reportImportCycles=false
-from typing import TYPE_CHECKING
 from uuid import UUID
 from pydantic import BaseModel
-
-if TYPE_CHECKING:
-    from app.schemas.document import GetDocument
-    from app.schemas.user import GetUser
 
 
 class BaseChat(BaseModel):
@@ -20,4 +15,11 @@ class GetChat(BaseChat):
 class GetChatDetail(GetChat):
     user: "GetUser"
     documents: list["GetDocument"]
-    messages: list[GetMessage]
+    messages: list["GetMessage"]
+
+
+from app.schemas.document import GetDocument
+from app.schemas.user import GetUser
+from app.schemas.message import GetMessage
+
+_ = GetChatDetail.model_rebuild()

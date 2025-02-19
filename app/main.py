@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from app.core.lifespan import lifespan
 from app.db.database import Base, engine
-from app.api import files, auth
+from app.api import files, auth, user
 
 import importlib
 import pkgutil
@@ -24,6 +24,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(files.router)
 app.include_router(auth.router)
+app.include_router(user.router)
 
 
 @app.get("/")

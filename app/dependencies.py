@@ -35,7 +35,7 @@ def get_s3_client() -> Minio:
 
 def get_user(
     db: Annotated[Session, Depends(get_db)],
-    token: Annotated[str, auth_service.OAUTH2_SCHEME],
+    token: Annotated[str, Depends(auth_service.OAUTH2_SCHEME)],
 ) -> User:
     try:
         user = auth_service.get_user_from_token(db, token)

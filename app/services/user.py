@@ -1,4 +1,3 @@
-# pyright: reportImportCycles=false
 from typing import final
 from uuid import UUID
 import uuid

@@ -1,4 +1,3 @@
-# pyright: reportImportCycles=false
 from datetime import datetime, timedelta, timezone
 from typing import final
 from uuid import UUID

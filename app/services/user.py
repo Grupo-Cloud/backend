@@ -1,6 +1,5 @@
 from typing import final
-from uuid import UUID
-import uuid
+from uuid import UUID, uuid4
 
 from pydantic import EmailStr
 from sqlalchemy import insert, select
@@ -24,7 +23,7 @@ class UserService:
         self, db: Session, email: EmailStr, username: str, hashed_secret: str
     ) -> None:
         statement = insert(User).values(
-            id=uuid.UUID(),
+            id=uuid4(),
             email=email,
             username=username,
             hashed_secret=hashed_secret,

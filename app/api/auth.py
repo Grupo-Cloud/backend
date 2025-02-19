@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.get("/login")
+@router.post("/login")
 def login_with_oauth2(
     db: Annotated[Session, Depends(get_db)],
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -26,7 +26,7 @@ def login_with_oauth2(
         return auth_service.handle_authentication(
             db, form_data.username, form_data.password
         )
-    except UserNotFoundException | InvalidPasswordException:
+    except (UserNotFoundException, InvalidPasswordException):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not authenticate with the provided user/password",

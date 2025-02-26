@@ -2,10 +2,12 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from jwt import InvalidTokenError
 from minio import Minio
+from qdrant_client import QdrantClient
 from functools import lru_cache
 
 from sqlalchemy.orm import Session
 from app.core.config import (
+    get_qdrant_settings,
     get_s3_settings,
 )
 from app.core.logger import get_logger  # Assuming you store env variables in settings
@@ -30,6 +32,19 @@ def get_s3_client() -> Minio:
         access_key=settings.S3_ACCESS_KEY,
         secret_key=settings.S3_SECRET_KEY,
         secure=settings.S3_SECURE,
+    )
+    
+@lru_cache
+def get_qdrant_client() ->  QdrantClient:
+    settings = get_qdrant_settings()
+
+    if not settings:
+        logger.warning("⚠️ Qdrant is disabled due to missing configuration.")
+        raise RuntimeError("Qdrant is disabled.")
+
+    return QdrantClient(
+        host=settings.QDRANT_HOST,
+        port=settings.QDRANT_PORT,
     )
 
 

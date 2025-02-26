@@ -7,7 +7,6 @@ from minio import Minio
 from app.core.config import S3Settings, get_s3_settings
 from app.dependencies import get_s3_client
 from app.services.document import service as document_service
-from app.services.document import FileExtension
 
 
 router = APIRouter(

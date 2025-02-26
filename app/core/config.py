@@ -33,6 +33,17 @@ class S3Settings(BaseSettings):
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=(".env", ".env.dev"), extra="ignore"
     )
+    
+class QdrantSettings(BaseSettings):
+    """Optional Qdrant settings. If missing, Qdrant operations will be disabled."""
+
+    QDRANT_HOST: str
+    QDRANT_PORT: int
+    
+
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        env_file=(".env", ".env.dev"), extra="ignore"
+    )
 
 
 # Load core settings (mandatory, app crashes if missing)
@@ -53,7 +64,17 @@ def get_s3_settings() -> S3Settings | None:
     except ValidationError:
         logger.warning("S3 settings are missing, S3 features are disabled.")
         return None
+    
+@lru_cache
+def get_qdrant_settings() -> QdrantSettings | None:
+    try:
+        return QdrantSettings.model_validate({})
+    except ValidationError:
+        logger.warning("Qdrant settings are missing, Qdrant features are disabled.")
+        return None
 
 
 _ = get_core_settings()
 _ = get_s3_settings()
+_ = get_qdrant_settings()
+

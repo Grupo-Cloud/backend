@@ -1,3 +1,4 @@
+# pyright: reportImportCycles=false
 from uuid import UUID
 from pydantic import BaseModel
 
@@ -17,11 +18,9 @@ class GetDocument(BaseDocument):
 
 
 class GetDocumentDetail(BaseDocument):
-    chunks: list["GetChunk"]
     user: "GetUser"
 
 
-from app.schemas.chunk import GetChunk
 from app.schemas.user import GetUser
 
 _ = GetDocumentDetail.model_rebuild()

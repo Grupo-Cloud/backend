@@ -9,7 +9,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
 
 if TYPE_CHECKING:
-    from app.models.chunk import Chunk
     from app.models.user import User
 
 
@@ -35,5 +34,4 @@ class Document(Base):
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
 
-    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")
     user: Mapped["User"] = relationship(back_populates="documents")

@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends, File, UploadFile
 import io
 
 from minio import Minio
-
 from app.core.config import S3Settings, get_s3_settings
 from app.dependencies import get_s3_client
 from app.services.document import service as document_service
@@ -33,6 +32,8 @@ async def upload_file(
         part_size=10 * 1024 * 1024,
     )
     file_extension = file.filename.split(".")[-1].lower()
-    doc = document_service.load_document(bytes_data, f'.{file_extension}')
-    print(doc)
+    documents = document_service.load_document(bytes_data, f'.{file_extension}')
+    chunks = document_service.create_chunks(documents)
+    document_service.upload_chunks_to_qdrant(chunks)
+    
     return {"filename": file.filename, "object_name": object_info.object_name}

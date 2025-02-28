@@ -10,7 +10,7 @@ from app.core.config import (
     get_qdrant_settings,
     get_s3_settings,
 )
-from app.core.logger import get_logger  # Assuming you store env variables in settings
+from app.core.logger import get_logger 
 from app.db.database import get_db
 from app.exceptions.user import UserNotFoundException
 from app.models.user import User
@@ -46,8 +46,7 @@ def get_qdrant_client() ->  QdrantClient:
         host=settings.QDRANT_HOST,
         port=settings.QDRANT_PORT,
     )
-
-
+    
 def get_user(
     db: Annotated[Session, Depends(get_db)],
     token: Annotated[str, Depends(auth_service.OAUTH2_SCHEME)],

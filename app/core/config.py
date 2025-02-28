@@ -39,7 +39,8 @@ class QdrantSettings(BaseSettings):
 
     QDRANT_HOST: str
     QDRANT_PORT: int
-    
+    QDRANT_COLLECTION_NAME: str
+    OLLAMA_URL: str
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=(".env", ".env.dev"), extra="ignore"

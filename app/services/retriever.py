@@ -15,5 +15,4 @@ vector_store = QdrantVectorStore.from_existing_collection(
 )
 
 def retrieve_documents(query: str, k: int = 3):
-    """Busca en Qdrant los documentos más relevantes usando búsqueda de similitud."""
     return vector_store.similarity_search(query, k=k)

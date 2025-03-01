@@ -4,14 +4,10 @@ import tempfile
 from contextlib import contextmanager
 from io import BytesIO
 from typing import Callable, Dict, List, Union, final, Generator
-from app.core.config import QdrantSettings, get_qdrant_settings
 from langchain_community.document_loaders import Docx2txtLoader, PyMuPDFLoader, TextLoader
 from langchain_core.documents.base import Document
-from langchain_qdrant import QdrantVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.core.logger import get_logger
-from langchain_ollama import OllamaEmbeddings
-from uuid import uuid4
 
 logger = get_logger(__name__)
 
@@ -33,23 +29,14 @@ class UnsupportedFileTypeError(Exception):
 @final
 class DocumentService:
 
-    def __init__(self, qdrant_settings: QdrantSettings) -> None:
+    def __init__(self) -> None:
         self._handlers: Dict[str, Callable[[BytesIO, str], DocumentOutput]] = {
             FileExtension.PDF.value: self._load_pdf,
             FileExtension.DOCX.value: self._load_docx,
             FileExtension.MD.value: self._load_text,
             FileExtension.TXT.value: self._load_text,
         }
-        self.embeddings = OllamaEmbeddings(
-            base_url=qdrant_settings.OLLAMA_URL,
-            model="mxbai-embed-large",         
-        )
-        self.vector_store = QdrantVectorStore.from_existing_collection(
-            embedding=self.embeddings,
-            collection_name=qdrant_settings.QDRANT_COLLECTION_NAME,
-            host=qdrant_settings.QDRANT_HOST,
-            port=qdrant_settings.QDRANT_PORT
-        )
+
 
     def load_document(self, document: BytesIO, file_extension: str) -> DocumentOutput:
 
@@ -84,16 +71,6 @@ class DocumentService:
         )
         return text_splitter.split_documents(list_of_documents)
     
-    
-        
-
-    def upload_chunks_to_qdrant(self, chunks: list[Document]) -> None:
-        uuids = [str(uuid4()) for _ in range(len(chunks))]
-        self.vector_store.add_documents(
-            documents=chunks,
-            ids=uuids
-        )
-        
         
     @contextmanager
     def _temp_file(self, document: BytesIO, suffix: str) -> Generator[str, None, None]:
@@ -119,4 +96,4 @@ class DocumentService:
             return text_loader.load()
 
 
-service = DocumentService(qdrant_settings=get_qdrant_settings())
+service = DocumentService()

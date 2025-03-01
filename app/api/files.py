@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends, File, UploadFile
 import io
 
 from minio import Minio
+from langchain_qdrant import QdrantVectorStore
 from app.core.config import S3Settings, get_s3_settings
-from app.dependencies import get_s3_client
+from app.dependencies import get_s3_client, get_qdrant_vector_store
 from app.services.document import service as document_service
 
 
@@ -20,6 +21,7 @@ async def upload_file(
     file: UploadFile = File(...),
     s3_client: Minio = Depends(get_s3_client),
     s3_settings: S3Settings = Depends(get_s3_settings),
+    vector_store: QdrantVectorStore = Depends(get_qdrant_vector_store),
 ):
     data = await file.read()
     bytes_data = io.BytesIO(data)
@@ -34,6 +36,9 @@ async def upload_file(
     file_extension = file.filename.split(".")[-1].lower()
     documents = document_service.load_document(bytes_data, f'.{file_extension}')
     chunks = document_service.create_chunks(documents)
-    document_service.upload_chunks_to_qdrant(chunks)
-    
+    uuids = [str(uuid.uuid4()) for _ in range(len(chunks))]
+    vector_store.add_documents(
+        documents=chunks,
+         ids=uuids
+    )
     return {"filename": file.filename, "object_name": object_info.object_name}

@@ -4,7 +4,8 @@ from jwt import InvalidTokenError
 from minio import Minio
 from qdrant_client import QdrantClient
 from functools import lru_cache
-
+from langchain_ollama import OllamaEmbeddings
+from langchain_qdrant import QdrantVectorStore
 from sqlalchemy.orm import Session
 from app.core.config import (
     get_qdrant_settings,
@@ -46,6 +47,26 @@ def get_qdrant_client() ->  QdrantClient:
         host=settings.QDRANT_HOST,
         port=settings.QDRANT_PORT,
     )
+    
+@lru_cache
+def get_qdrant_vector_store() -> QdrantVectorStore:
+    settings = get_qdrant_settings()
+
+    if not settings:
+        logger.warning("⚠️ Qdrant Vector Store is disabled due to missing configuration.")
+        raise RuntimeError("Qdrant Vector Store is disabled.")
+
+    embeddings = OllamaEmbeddings(
+        base_url=settings.OLLAMA_URL,
+        model="mxbai-embed-large",         
+    )
+    vector_store = QdrantVectorStore.from_existing_collection(
+        embedding=embeddings,
+        collection_name=settings.QDRANT_COLLECTION_NAME,
+        host=settings.QDRANT_HOST,
+        port=settings.QDRANT_PORT,
+    )
+    return vector_store
     
 def get_user(
     db: Annotated[Session, Depends(get_db)],

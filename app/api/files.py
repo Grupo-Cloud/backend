@@ -1,12 +1,14 @@
-import uuid
+from typing import Annotated
 from fastapi import APIRouter, Depends, File, UploadFile
 import io
-
 from minio import Minio
 from langchain_qdrant import QdrantVectorStore
 from app.core.config import S3Settings, get_s3_settings
 from app.dependencies import get_s3_client, get_qdrant_vector_store
-from app.services.document import service as document_service
+from app.services.vector import service as vector_service
+from app.services.s3 import service as s3_service
+from app.models.user import User
+from app.dependencies import get_user
 
 
 router = APIRouter(
@@ -15,30 +17,22 @@ router = APIRouter(
     responses={404: {"detail": "File could not be found"}},
 )
 
-
 @router.post("/upload")
 async def upload_file(
+    user: Annotated[User, Depends(get_user)],
     file: UploadFile = File(...),
     s3_client: Minio = Depends(get_s3_client),
     s3_settings: S3Settings = Depends(get_s3_settings),
     vector_store: QdrantVectorStore = Depends(get_qdrant_vector_store),
-):
+    
+):  
     data = await file.read()
     bytes_data = io.BytesIO(data)
-    object_info = s3_client.put_object(
-        bucket_name=s3_settings.S3_DOCUMENT_BUCKET,
-        object_name=file.filename or str(uuid.uuid4()),
-        data=bytes_data,
-        content_type=file.content_type or "",
-        length=-1,
-        part_size=10 * 1024 * 1024,
+    s3_service.load_document_into_s3(
+        bytes_data,user.id, file.filename, file.content_type, s3_client, s3_settings
     )
     file_extension = file.filename.split(".")[-1].lower()
-    documents = document_service.load_document(bytes_data, f'.{file_extension}')
-    chunks = document_service.create_chunks(documents)
-    uuids = [str(uuid.uuid4()) for _ in range(len(chunks))]
-    vector_store.add_documents(
-        documents=chunks,
-         ids=uuids
+    vector_service.load_document_into_vector_database(
+        bytes_data, f'.{file_extension}', vector_store
     )
-    return {"filename": file.filename, "object_name": object_info.object_name}
+    return {"filename": file.filename}

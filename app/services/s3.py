@@ -10,11 +10,10 @@ DEFAULT_FILE_PART_SIZE = 10 * 1024 * 1024
 
 @final
 class S3Service:
-    pass
-
     def load_document_into_s3(
         self,
         bytes: BytesIO,
+        user_id: str,
         filename: str,
         content_type: str | None,
         s3_client: Minio,
@@ -25,13 +24,13 @@ class S3Service:
         """
         result = s3_client.put_object(
             bucket_name=s3_settings.S3_DOCUMENT_BUCKET,
-            object_name=filename,
+            object_name= f"{user_id}/{filename}",
             data=bytes,
             content_type=content_type or "",
             length=-1,
             part_size=DEFAULT_FILE_PART_SIZE,
         )
         return result.object_name
-
+    
 
 service = S3Service()

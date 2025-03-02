@@ -1,4 +1,5 @@
 # pyright: reportImportCycles=false
+from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel
 
@@ -14,11 +15,15 @@ class BaseDocument(BaseModel):
 
 
 class GetDocument(BaseDocument):
-    pass
+    created_at: datetime
 
 
-class GetDocumentDetail(BaseDocument):
+class GetDocumentDetail(GetDocument):
     user: "GetUser"
+
+
+class CreateDocument(BaseDocument):
+    user_id: UUID
 
 
 from app.schemas.user import GetUser

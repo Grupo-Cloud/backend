@@ -34,13 +34,6 @@ class UserService:
         _ = db.execute(statement)
         db.commit()
 
-    def get_documents_from_user(self, db: Session, user_id: UUID) -> list[Document]:
-        statement = select(User).filter_by(id=user_id)
-        user = db.execute(statement).scalar_one_or_none()
-        if not user:
-            raise UserNotFoundException(f"User with id {user_id} could not be found")
-        return user.documents
-
     def get_chats_from_user(self, db: Session, user_id: UUID) -> list[Chat]:
         statement = select(User).filter_by(id=user_id)
         user = db.execute(statement).scalar_one_or_none()

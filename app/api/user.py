@@ -26,26 +26,6 @@ def get_current_user(user: Annotated[User, Depends(get_user)]):
     return user
 
 
-@router.get("/{user_id}/documents", response_model=list[GetDocumentDetail])
-def get_user_documents(
-    user_id: UUID,
-    user: Annotated[User, Depends(get_user)],
-    db: Annotated[Session, Depends(get_db)],
-):
-    if user.id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="You are not allowed to perform this action",
-        )
-    try:
-        return service.get_documents_from_user(db, user_id)
-    except UserNotFoundException:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Could not find the user you are trying to get documents from",
-        )
-
-
 @router.get("/{user_id}/chats", response_model=list[GetChatDetail])
 def get_user_chats(
     user_id: UUID,

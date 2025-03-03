@@ -4,12 +4,15 @@ from pydantic import BaseModel
 
 
 class BaseChat(BaseModel):
-    id: UUID
     name: str
 
 
 class GetChat(BaseChat):
-    pass
+    id: UUID
+
+
+class CreateChat(BaseChat):
+    user_id: UUID
 
 
 class GetChatDetail(GetChat):

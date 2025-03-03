@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class Chunk(Base):
-    __tablename__: str = "document"
+    __tablename__: str = "chunk"
 
     id: Mapped[str] = mapped_column(primary_key=True)
     document_id: Mapped[str] = mapped_column(ForeignKey("user.id"))

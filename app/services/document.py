@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
 from app.core.logger import get_logger
+from app.exceptions.document import DocumentNotFoundException
 from app.exceptions.user import UserNotFoundException
 from app.models.document import Document, FileType
 from app.models.user import User
@@ -36,6 +37,15 @@ class DocumentService:
         if not user:
             raise UserNotFoundException(f"User with id {user_id} could not be found")
         return user.documents
+
+    def get_document(self, db: Session, document_id: UUID) -> Document:
+        statement = select(Document).filter_by(id=document_id)
+        document = db.execute(statement).scalar_one_or_none()
+        if not document:
+            raise DocumentNotFoundException(
+                f"Document with id {document_id} could not be found"
+            )
+        return document
 
     def extension_to_filetype(self, extension: str) -> FileType | None:
         translation_table = {

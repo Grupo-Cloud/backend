@@ -1,7 +1,7 @@
 from typing import final
 from uuid import UUID
 
-from sqlalchemy import insert, select
+from sqlalchemy import delete, insert, select
 from sqlalchemy.orm import Session
 from app.core.logger import get_logger
 from app.exceptions.document import DocumentNotFoundException
@@ -46,6 +46,11 @@ class DocumentService:
                 f"Document with id {document_id} could not be found"
             )
         return document
+
+    def drop_document(self, db: Session, document_id: UUID) -> None:
+        statement = delete(Document).filter_by(id=document_id)
+        _ = db.execute(statement)
+        db.commit()
 
     def extension_to_filetype(self, extension: str) -> FileType | None:
         translation_table = {

@@ -1,5 +1,6 @@
 from io import BytesIO
 from typing import final
+from uuid import UUID
 
 from minio import Minio
 
@@ -13,7 +14,7 @@ class S3Service:
     def load_document_into_s3(
         self,
         bytes: BytesIO,
-        user_id: str,
+        user_id: UUID,
         filename: str,
         content_type: str | None,
         s3_client: Minio,

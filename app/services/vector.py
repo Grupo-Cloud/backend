@@ -3,10 +3,10 @@ from contextlib import contextmanager
 import enum
 from io import BytesIO
 import tempfile
-from typing import Callable, final
+from typing import Callable, Sequence, cast, final
+from uuid import UUID
 import uuid
 
-from fastapi import UploadFile
 from langchain_community.document_loaders import (
     Docx2txtLoader,
     PyMuPDFLoader,
@@ -18,7 +18,6 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents.base import Document as LangChainDocument
 
 from app.core.logger import get_logger
-from app.exceptions.vector import UnsupportedFileTypeError
 
 logger = get_logger(__name__)
 
@@ -44,7 +43,7 @@ class VectorService:
 
     def load_document_into_vector_database(
         self, document: BytesIO, file_extension: str, vector_store: QdrantVectorStore
-    ) -> None:
+    ) -> list[str]:
         _ = document.seek(0)
         handler = self._handlers[file_extension]
 
@@ -71,7 +70,13 @@ class VectorService:
         chunks = text_splitter.split_documents(lc_documents)
         uuids = [str(uuid.uuid4()) for _ in range(len(chunks))]
 
-        _ = vector_store.add_documents(documents=chunks, ids=uuids)
+        chunk_ids = vector_store.add_documents(documents=chunks, ids=uuids)
+        return chunk_ids
+
+    def drop_chunks_from_document_id(
+        self, chunk_ids: list[str], vector_store: QdrantVectorStore
+    ):
+        _ = vector_store.delete(ids=cast(list[str | int], chunk_ids))
 
     @contextmanager
     def _temp_file(self, document: BytesIO, suffix: str) -> Generator[str, None, None]:

@@ -54,10 +54,10 @@ class DocumentService:
 
     def extension_to_filetype(self, extension: str) -> FileType | None:
         translation_table = {
-            FileExtension.PDF.name: FileType.PDF,
-            FileExtension.DOCX.name: FileType.DOCX,
-            FileExtension.MD.name: FileType.MARKDOWN,
-            FileExtension.TXT.name: FileType.PLAIN,
+            FileExtension.PDF.value: FileType.PDF,
+            FileExtension.DOCX.value: FileType.DOCX,
+            FileExtension.MD.value: FileType.MARKDOWN,
+            FileExtension.TXT.value: FileType.PLAIN,
         }
         return translation_table.get(extension)
 

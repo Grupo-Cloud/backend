@@ -96,6 +96,7 @@ def create_document(
             id=document_id,
             name=upload_file.filename,
             file_type=file_type,
+            size=upload_file.size or -1,
             s3_location=s3_location,
             user_id=user_id,
         ),

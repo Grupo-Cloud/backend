@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.lifespan import lifespan
 from app.db.database import Base, engine
-from app.api import files, auth, user, document, chat, messages
+from app.api import auth, user, document, chat, messages
 
 import importlib
 import pkgutil
@@ -21,6 +22,14 @@ for module_info in pkgutil.iter_modules(
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(document.router)
 app.include_router(auth.router)

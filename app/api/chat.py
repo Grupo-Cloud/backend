@@ -19,7 +19,34 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[GetChatDetail], status_code=status.HTTP_200_OK)
+@router.get("/{chat_id}", response_model=GetChatDetail, status_code=status.HTTP_200_OK)
+def get_user_chat(
+    user_id: UUID,
+    chat_id: UUID,
+    user: Annotated[User, Depends(get_user)],
+    db: Annotated[Session, Depends(get_db)],
+):
+    if user.id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are not allowed to perform this action",
+        )
+    try:
+        chat = service.get_chat(db, chat_id)
+    except ChatNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find the user you are trying to get chats from",
+        )
+    if chat.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are not allowed to perform this action",
+        )
+    return chat
+
+
+@router.get("/", response_model=list[GetChat], status_code=status.HTTP_200_OK)
 def get_user_chats(
     user_id: UUID,
     user: Annotated[User, Depends(get_user)],

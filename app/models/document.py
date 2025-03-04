@@ -10,6 +10,7 @@ from app.db.database import Base
 
 if TYPE_CHECKING:
     from app.models.user import User
+    from app.models.chunk import Chunk
 
 
 class FileType(enum.Enum):
@@ -35,3 +36,4 @@ class Document(Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
 
     user: Mapped["User"] = relationship(back_populates="documents")
+    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")

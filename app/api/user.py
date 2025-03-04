@@ -14,11 +14,6 @@ router = APIRouter(
 )
 
 
-@router.get("/{user_id}", response_model=GetUserDetail)
-def get_user_from_id(user_id: UUID, user: Annotated[User, Depends(get_user)]):
-    if user.id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="You are not allowed to perform this action",
-        )
+@router.get("/me", response_model=GetUserDetail)
+def get_user_from_token(user: Annotated[User, Depends(get_user)]):
     return user

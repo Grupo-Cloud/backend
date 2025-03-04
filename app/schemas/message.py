@@ -4,17 +4,20 @@ from pydantic import BaseModel
 
 
 class BaseMessage(BaseModel):
-    id: UUID
     content: str
-    from_user: bool
 
 
 class GetMessage(BaseMessage):
-    pass
+    id: UUID
+    from_user: bool
 
 
 class GetMessageDetail(GetMessage):
     chat: "GetChat"
+
+
+class CreateMessage(BaseMessage):
+    pass
 
 
 from app.schemas.chat import GetChat

@@ -36,4 +36,4 @@ class Document(Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
 
     user: Mapped["User"] = relationship(back_populates="documents")
-    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")
+    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document", cascade="all,delete-orphan", passive_deletes=True)

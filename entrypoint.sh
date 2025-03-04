@@ -12,10 +12,9 @@ echo "🟢 Model has been downloaded"
 sleep 5
 
 echo " 🔴 Retrieve llama3 8b model"
-ollama run llama3:8b
+ollama pull llama3:8b
 echo "🟢 Model has been downloaded"
 
-wait $pid
-
-
-
+if [[ ! -z "$pid" ]]; then
+    wait "$pid"
+fi

@@ -11,7 +11,10 @@ logger = get_logger(__name__)
 class CoreSettings(BaseSettings):
     """Critical settings that must be defined, otherwise app crashes."""
 
-    DATABASE_URL: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    POSTGRES_HOST: str
     JWT_SECRET_KEY: str
     JWT_REFRESH_KEY: str
 

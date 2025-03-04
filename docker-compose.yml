@@ -13,7 +13,9 @@ services:
     depends_on:
       ollama:
         condition: service_healthy
-    
+      database:
+        condition: service_started
+      
 
   minio:
     container_name: minio
@@ -59,13 +61,6 @@ services:
       - ./entrypoint.sh:/entrypoint.sh
     entrypoint: ["/usr/bin/bash", "/entrypoint.sh"]
     restart: always
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     networks:
       - custom_network
     healthcheck:
@@ -75,10 +70,25 @@ services:
       retries: 30
       start_period: 60s
 
+  database:
+    image: postgres:alpine
+    container_name: db
+    restart: always
+    env_file:
+      - .env.dev
+    expose:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - custom_network
+
+
 volumes:
   storage: {}
   qdrant_data: {}
   ollama_data: {}
+  pg_data: {}
 
 networks:
   custom_network:

@@ -22,7 +22,6 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(files.router)
 app.include_router(document.router)
 app.include_router(auth.router)
 app.include_router(user.router)

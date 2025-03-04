@@ -1,9 +1,10 @@
 from typing import final
 from uuid import UUID
 
-from sqlalchemy import insert, select
+from sqlalchemy import delete, insert, select
 from sqlalchemy.orm import Session
 from app.core.logger import get_logger
+from app.exceptions.document import DocumentNotFoundException
 from app.exceptions.user import UserNotFoundException
 from app.models.document import Document, FileType
 from app.models.user import User
@@ -37,12 +38,26 @@ class DocumentService:
             raise UserNotFoundException(f"User with id {user_id} could not be found")
         return user.documents
 
+    def get_document(self, db: Session, document_id: UUID) -> Document:
+        statement = select(Document).filter_by(id=document_id)
+        document = db.execute(statement).scalar_one_or_none()
+        if not document:
+            raise DocumentNotFoundException(
+                f"Document with id {document_id} could not be found"
+            )
+        return document
+
+    def drop_document(self, db: Session, document_id: UUID) -> None:
+        statement = delete(Document).filter_by(id=document_id)
+        _ = db.execute(statement)
+        db.commit()
+
     def extension_to_filetype(self, extension: str) -> FileType | None:
         translation_table = {
-            FileExtension.PDF.name: FileType.PDF,
-            FileExtension.DOCX.name: FileType.DOCX,
-            FileExtension.MD.name: FileType.MARKDOWN,
-            FileExtension.TXT.name: FileType.PLAIN,
+            FileExtension.PDF.value: FileType.PDF,
+            FileExtension.DOCX.value: FileType.DOCX,
+            FileExtension.MD.value: FileType.MARKDOWN,
+            FileExtension.TXT.value: FileType.PLAIN,
         }
         return translation_table.get(extension)
 

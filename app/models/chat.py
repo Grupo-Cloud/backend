@@ -1,8 +1,9 @@
 # pyright: reportImportCycles=false
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
 
@@ -21,6 +22,12 @@ class Chat(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
+    creation_date: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now(timezone.utc),
+        server_default=func.now(),
+        nullable=False
+    )
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"), nullable=False)
     chat_documents: Mapped[list["ChatDocument"]] = relationship(back_populates="chat")

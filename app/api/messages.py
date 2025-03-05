@@ -58,4 +58,4 @@ def send_message(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You are not allowed to perform this action",
         )
-    return service.create_message(db, create_message, False)
+    return service.create_message(db, create_message, chat_id, False)

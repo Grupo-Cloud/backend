@@ -13,6 +13,6 @@ class Message(Base):
     content: Mapped[str] = mapped_column(nullable=False)
     from_user: Mapped[bool] = mapped_column(nullable=False)
 
-    chat_id: Mapped[UUID] = mapped_column(ForeignKey("chat.id"), nullable=False)
+    chat_id: Mapped[UUID] = mapped_column(ForeignKey("chat.id", ondelete="CASCADE"), nullable=False)
 
     chat: Mapped["Chat"] = relationship(back_populates="messages")

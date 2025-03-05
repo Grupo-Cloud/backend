@@ -4,7 +4,8 @@ from app.core.config import get_core_settings
 
 settings = get_core_settings()
 
-engine = create_engine(settings.DATABASE_URL)
+engine = create_engine( f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:5432/{settings.POSTGRES_DB}")
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

@@ -40,9 +40,10 @@ class ChatService:
         return chat
 
     def delete_chat(self, db: Session, chat_id: UUID) -> None:
-        statement = delete(Chat).filter_by(id=chat_id)
-        _ = db.execute(statement)
-        db.commit()
+        chat = db.query(Chat).filter(Chat.id == chat_id).first()
+        if chat:
+            db.delete(chat)
+            db.commit()
 
 
 service = ChatService()

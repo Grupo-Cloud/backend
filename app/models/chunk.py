@@ -12,5 +12,5 @@ class Chunk(Base):
     __tablename__: str = "chunk"
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    document_id: Mapped[str] = mapped_column(ForeignKey("document.id"))
+    document_id: Mapped[str] = mapped_column(ForeignKey("document.id", ondelete="CASCADE"), nullable=False)
     document: Mapped["Document"] = relationship(back_populates="chunks")

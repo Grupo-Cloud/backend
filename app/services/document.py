@@ -48,9 +48,10 @@ class DocumentService:
         return document
 
     def drop_document(self, db: Session, document_id: UUID) -> None:
-        statement = delete(Document).filter_by(id=document_id)
-        _ = db.execute(statement)
-        db.commit()
+        document = db.query(Document).filter(Document.id == document_id).first()
+        if document:
+            db.delete(document)
+            db.commit()
 
     def extension_to_filetype(self, extension: str) -> FileType | None:
         translation_table = {

@@ -38,10 +38,10 @@ class MessageService:
         return message
 
     def create_message(
-        self, db: Session, create_message: CreateMessage, from_user: bool
+        self, db: Session, create_message: CreateMessage, chat_id: UUID, from_user: bool
     ) -> Message:
         message = Message(
-            id=uuid.uuid4(), content=create_message.content, from_user=from_user
+            id=uuid.uuid4(), content=create_message.content, chat_id=chat_id, from_user=from_user
         )
         db.add(message)
         db.commit()

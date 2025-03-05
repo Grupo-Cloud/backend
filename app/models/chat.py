@@ -26,7 +26,7 @@ class Chat(Base):
     chat_documents: Mapped[list["ChatDocument"]] = relationship(back_populates="chat")
 
     user: Mapped["User"] = relationship(back_populates="chats")
-    messages: Mapped[list["Message"]] = relationship(back_populates="chat")
+    messages: Mapped[list["Message"]] = relationship(back_populates="chat", cascade="all,delete-orphan", passive_deletes=True)
     documents: AssociationProxy[list["Document"]] = association_proxy(
         "chat_documents", "document"
     )

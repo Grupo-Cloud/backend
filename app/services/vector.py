@@ -55,8 +55,8 @@ class VectorService:
         )
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=100,  # Modify
-            chunk_overlap=20,  # Modify
+            chunk_size=512,  
+            chunk_overlap=50,  
             length_function=len,
             is_separator_regex=False,
             separators=[

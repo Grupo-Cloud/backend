@@ -4,10 +4,11 @@ from jwt import InvalidTokenError
 from minio import Minio
 from qdrant_client import QdrantClient
 from functools import lru_cache
-from langchain_ollama import OllamaEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from sqlalchemy.orm import Session
 from app.core.config import (
+    get_core_settings,
     get_qdrant_settings,
     get_s3_settings,
 )
@@ -51,15 +52,18 @@ def get_qdrant_client() ->  QdrantClient:
 @lru_cache
 def get_qdrant_vector_store() -> QdrantVectorStore:
     settings = get_qdrant_settings()
-
+    gooogle_api_key = get_core_settings().GOOGLE_API_KEY
+    
     if not settings:
         logger.warning("⚠️ Qdrant Vector Store is disabled due to missing configuration.")
         raise RuntimeError("Qdrant Vector Store is disabled.")
+    
+    if not gooogle_api_key:
+        logger.warning("⚠️ Google API Key is disabled due to missing configuration.")
+        raise RuntimeError("Google API Key is disabled for Google Generative AI Embeddings.")
 
-    embeddings = OllamaEmbeddings(
-        base_url=settings.OLLAMA_URL,
-        model="mxbai-embed-large",         
-    )
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=gooogle_api_key)
+    
     vector_store = QdrantVectorStore.from_existing_collection(
         embedding=embeddings,
         collection_name=settings.QDRANT_COLLECTION_NAME,

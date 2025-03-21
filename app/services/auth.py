@@ -23,7 +23,7 @@ class AuthService:
     OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="/auth/login")
     ALGORITHM = "HS256"
 
-    ACCESS_TOKEN_EXPIRATION = timedelta(minutes=15)
+    ACCESS_TOKEN_EXPIRATION = timedelta(minutes=6)
     REFRESH_TOKEN_EXPIRATION = timedelta(weeks=1)
 
     core_settings: CoreSettings

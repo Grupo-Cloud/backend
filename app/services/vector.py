@@ -104,7 +104,6 @@ class VectorService:
             return text_loader.load()
 
     def retrieve_documents(self, user_query: str, vector_store: QdrantVectorStore) -> list[LangChainDocument]:
-       
         results = vector_store.similarity_search(user_query, k=3)  
         return results
 

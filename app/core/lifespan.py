@@ -43,7 +43,7 @@ def setup_qdrant(client:  QdrantClient, settings: QdrantSettings):
     if not client.collection_exists(settings.QDRANT_COLLECTION_NAME):
         client.create_collection(
             collection_name=settings.QDRANT_COLLECTION_NAME,
-            vectors_config=VectorParams(size=1024, distance=Distance.COSINE),
+            vectors_config=VectorParams(size=768, distance=Distance.COSINE),
         )
         logger.info(f"🗂️ Created Qdrant collection: {settings.QDRANT_COLLECTION_NAME}")
     

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class BaseMessage(BaseModel):
     content: str
+    from_user: bool
 
 
 class GetMessage(BaseMessage):

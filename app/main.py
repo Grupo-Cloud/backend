@@ -20,6 +20,8 @@ for module_info in pkgutil.iter_modules(
     _ = importlib.import_module(module_info.name)
 
 
+
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(lifespan=lifespan)

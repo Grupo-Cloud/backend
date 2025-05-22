@@ -28,6 +28,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[GetDocumentDetail], status_code=status.HTTP_200_OK)
+@router.get("", response_model=list[GetDocumentDetail], status_code=status.HTTP_200_OK)
 def get_user_documents(
     user_id: UUID,
     user: Annotated[User, Depends(get_user)],
@@ -48,6 +49,8 @@ def get_user_documents(
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED) 
+
 def create_document(
     user_id: UUID,
     user: Annotated[User, Depends(get_user)],
@@ -105,6 +108,7 @@ def create_document(
 
 
 @router.delete("/{document_id}")
+
 def delete_document(
     user_id: UUID,
     document_id: UUID,

@@ -18,6 +18,7 @@ router = APIRouter(
 )
 
 
+
 @router.get("/", response_model=list[GetMessageDetail], status_code=status.HTTP_200_OK)
 def get_chat_messages(
     chat_id: UUID,

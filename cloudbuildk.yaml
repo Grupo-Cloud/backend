@@ -82,21 +82,6 @@ steps:
       - '--add-cloudsql-instances'
       - '${_CLOUD_SQL_CONNECTION_NAME}'
 
-# Substitution variables that you'll set in Cloud Build triggers
-substitutions:
-  _CLOUD_SQL_CONNECTION_NAME: 'proyectocloud-455517:us-central1:pg-db'
-  _POSTGRES_USER: 'cloud'
-  _POSTGRES_PASSWORD: 'cloud123'
-  _POSTGRES_DB: 'postgres'
-  _JWT_SECRET_KEY: 'oXEvSSFm4-KJ_0TstrJ83IYVVPD36kgvSh-MJOQn4SvO3ZOxQU7ay6hf-r-ylrkqt8uhnYQP5OMrSa7v2GTMow'
-  _JWT_REFRESH_KEY: 'k9B8HmVBS49Ghasr70v7AUA6OLOaSoEwdu00sWkFsOcj4s6y8kxHBcqXB1jmnOwfQbcn_4S6WO2zfAmUEWgOJQ'
-  _GOOGLE_API_KEY: 'AIzaSyA42jL2yYqlY8_DANM-fdZ5p75EChQ-F04'
-  _GCS_BUCKET_NAME: 'documents-1f8ab091a27a451caf02da6239f9f50a'
-  _GCS_ACCESS_KEY: 'GOOGPKETNBL3JG6CK7H6LZNA'
-  _GCS_SECRET_KEY: 'gxOgTXDvhvm8XS0ZVoaBHGDpurakzC90a+VnDVu5'
-  _QDRANT_HOST: 'your-qdrant-compute-engine-ip'
-  _QDRANT_PORT: '6333'
-  _QDRANT_COLLECTION_NAME: 'chunks'
 
 timeout: '1200s'
 

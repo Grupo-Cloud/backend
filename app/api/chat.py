@@ -20,6 +20,7 @@ router = APIRouter(
 
 
 @router.get("/{chat_id}", response_model=GetChatDetail, status_code=status.HTTP_200_OK)
+
 def get_user_chat(
     user_id: UUID,
     chat_id: UUID,
@@ -47,6 +48,7 @@ def get_user_chat(
 
 
 @router.get("/", response_model=list[GetChat], status_code=status.HTTP_200_OK)
+@router.get("", response_model=list[GetChat], status_code=status.HTTP_200_OK)
 def get_user_chats(
     user_id: UUID,
     user: Annotated[User, Depends(get_user)],
@@ -67,6 +69,7 @@ def get_user_chats(
 
 
 @router.post("/", response_model=GetChat, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=GetChat, status_code=status.HTTP_201_CREATED)
 def create_chat(
     user_id: UUID,
     create_chat: CreateChat,
@@ -87,6 +90,7 @@ def create_chat(
 
 
 @router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
+
 def delete_chat(
     user_id: UUID,
     chat_id: UUID,

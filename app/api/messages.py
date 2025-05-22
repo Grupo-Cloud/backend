@@ -20,6 +20,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[GetMessageDetail], status_code=status.HTTP_200_OK)
+@router.get("", response_model=list[GetMessageDetail], status_code=status.HTTP_200_OK)
 def get_chat_messages(
     chat_id: UUID,
     user: Annotated[User, Depends(get_user)],
@@ -41,6 +42,7 @@ def get_chat_messages(
 
 
 @router.post("/", response_model=GetMessage, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=GetMessage, status_code=status.HTTP_201_CREATED)
 def send_message(
     chat_id: UUID,
     create_message: CreateMessage,

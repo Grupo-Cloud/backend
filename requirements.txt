@@ -121,9 +121,5 @@ uvicorn==0.34.0
 uvloop==0.21.0
 watchfiles==1.0.4
 websockets==14.2
-win32_setctime==1.2.0
 yarl==1.18.3
 zstandard==0.23.0
-google-cloud-storage==2.13.0
-google-cloud-sql==0.11.0
-pg8000==1.30.5

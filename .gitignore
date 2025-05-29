@@ -178,3 +178,4 @@ cython_debug/
 # database
 *.sqlite3
 *.db
+gcp-creds.json

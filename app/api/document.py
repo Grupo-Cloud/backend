@@ -1,29 +1,39 @@
-from io import BytesIO
+import json
 import os
+import uuid
+from io import BytesIO
 from typing import Annotated
 from uuid import UUID
-import uuid
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from google.cloud import pubsub_v1
 from langchain_qdrant import QdrantVectorStore
 from minio import Minio
 from sqlalchemy.orm import Session
 
-from app.core.config import S3Settings, get_s3_settings
+from app.core.config import S3Settings, get_pubsub_settings, get_s3_settings
 from app.db.database import get_db
 from app.dependencies import get_qdrant_vector_store, get_s3_client, get_user
 from app.exceptions.document import DocumentNotFoundException
 from app.exceptions.user import UserNotFoundException
 from app.models.user import User
 from app.schemas.document import CreateDocument, GetDocumentDetail
-from app.services.document import service
-from app.services.vector import service as vector_service
-from app.services.s3 import service as s3_service
 from app.services.chunk import service as chunk_service
+from app.services.document import service
+from app.services.s3 import service as s3_service
+from app.services.vector import service as vector_service
 
 router = APIRouter(
     prefix="/users/{user_id}/documents",
     tags=["documents"],
     responses={404: {"detail": "Could not find the requested document(s)"}},
+)
+
+pubsub_settings = get_pubsub_settings()
+
+publisher = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path(
+    pubsub_settings.GCP_PROJECT_ID, pubsub_settings.GCP_TOPIC
 )
 
 
@@ -114,9 +124,6 @@ def delete_document(
     document_id: UUID,
     user: Annotated[User, Depends(get_user)],
     db: Annotated[Session, Depends(get_db)],
-    s3_client: Annotated[Minio, Depends(get_s3_client)],
-    s3_settings: Annotated[S3Settings, Depends(get_s3_settings)],
-    vector_store: Annotated[QdrantVectorStore, Depends(get_qdrant_vector_store)],
 ):
     if user.id != user_id:
         raise HTTPException(
@@ -135,8 +142,11 @@ def delete_document(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You are not allowed to perform this action",
         )
-    s3_service.delete_document_from_s3(document.s3_location, s3_client, s3_settings)
-    vector_service.drop_chunks_from_document_id(
-        [chunk.id for chunk in document.chunks], vector_store
-    )
-    service.drop_document(db, document_id)
+    # Message must be bytes
+    message_content = {"type": "delete", "doc_id": str(document_id)}
+
+    message_data = json.dumps(message_content).encode("utf-8")
+
+    # Publish the message
+    future = publisher.publish(topic_path, message_data)
+    print(f"Published message ID: {future.result()}")

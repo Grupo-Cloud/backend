@@ -1,5 +1,6 @@
 from functools import lru_cache
 from typing import ClassVar
+
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -37,13 +38,25 @@ class S3Settings(BaseSettings):
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=(".env", ".env.dev"), extra="ignore"
     )
-    
+
+
 class QdrantSettings(BaseSettings):
     """Optional Qdrant settings. If missing, Qdrant operations will be disabled."""
 
     QDRANT_HOST: str
     QDRANT_PORT: int
     QDRANT_COLLECTION_NAME: str
+
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        env_file=(".env", ".env.dev"), extra="ignore"
+    )
+
+
+class PubSubSettings(BaseSettings):
+    """Pub/Sub topic subscription configuration."""
+
+    GCP_PROJECT_ID: str
+    GCP_TOPIC: str
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=(".env", ".env.dev"), extra="ignore"
@@ -68,7 +81,8 @@ def get_s3_settings() -> S3Settings | None:
     except ValidationError:
         logger.warning("S3 settings are missing, S3 features are disabled.")
         return None
-    
+
+
 @lru_cache
 def get_qdrant_settings() -> QdrantSettings | None:
     try:
@@ -78,7 +92,17 @@ def get_qdrant_settings() -> QdrantSettings | None:
         return None
 
 
+# Load pubsub settings (mandatory, app crashes if missing)
+@lru_cache
+def get_pubsub_settings() -> PubSubSettings:
+    try:
+        return PubSubSettings.model_validate({})
+    except ValidationError as e:
+        logger.critical(f"❌ Missing critical environment variables for pubsub: {e}")
+        raise SystemExit(1)  # ❌ Hard crash
+
+
 _ = get_core_settings()
 _ = get_s3_settings()
 _ = get_qdrant_settings()
-
+_ = get_pubsub_settings()
